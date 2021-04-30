@@ -11,8 +11,7 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - ./devops/docker/traefik/traefik_dynamic.toml:/etc/traefik/traefik_dynamic.toml:ro
       - /tmp:/var/traefik/logs/
-    env_file:
-      - traefik.env
+
     environment:
       - TRAEFIK_API_INSECURE=true
       - TRAEFIK_API_DASHBOARD=true
