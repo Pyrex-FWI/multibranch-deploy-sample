@@ -1,0 +1,4 @@
+# traefik/traefik.config.toml
+[http.middlewares]
+  [http.middlewares.redirect.redirectscheme]
+    scheme = "https"
