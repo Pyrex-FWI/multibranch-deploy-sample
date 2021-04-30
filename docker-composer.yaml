@@ -1,0 +1,45 @@
+version: "3.9"
+
+services:
+  reverse-proxy:
+    build:
+      context: devops/docker/traefik
+    ports:
+      - "80:80"
+      - "8181:8080"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./devops/docker/traefik/traefik_dynamic.toml:/etc/traefik/traefik_dynamic.toml:ro
+      - /tmp:/var/traefik/logs/
+    env_file:
+      - traefik.env
+    environment:
+      - TRAEFIK_API_INSECURE=true
+      - TRAEFIK_API_DASHBOARD=true
+      - TRAEFIK_API_DEBUG=true
+      - TRAEFIK_PROVIDERS_DOCKER=true
+      - TRAEFIK_PROVIDERS_DOCKER_ENDPOINT=unix:///var/run/docker.sock
+      - TRAEFIK_PROVIDERS_FILE_FILENAME=/etc/traefik/traefik_dynamic.toml
+      - TRAEFIK_PROVIDERS_FILE_WATCH=true
+      - TRAEFIK_GLOBAL_CHECKNEWVERSION=true
+      - TRAEFIK_ACCESSLOG=true
+      - TRAEFIK_ACCESSLOG_FORMAT=json
+      - TRAEFIK_LOG=true
+      - TRAEFIK_LOG_LEVEL=ERROR
+      - TRAEFIK_LOG_FORMAT=json
+      - TRAEFIK_ENTRYPOINTS_WEB=true
+      - TRAEFIK_ENTRYPOINTS_WEB_ADDRESS=:80
+      - TRAEFIK_ENTRYPOINTS_WEB_FORWARDEDHEADERS_INSECURE=true
+    restart: always
+    depends_on:
+      - jenkins
+  webserver:
+    image: httpd:2.4-alpine
+    volumes:
+      - ./../../../.tmp/httpd/git.cpyree.fr:/var/www/git.cpyree.fr
+      - ./../httpd/my-httpd.conf:/usr/local/apache2/conf/httpd.conf
+      - ./../httpd/conf/extra/httpd-vhosts-git.conf:/usr/local/apache2/conf/extra/httpd-vhosts-git.conf
+    labels:
+      - "traefik.http.routers.webserver.rule=HostRegexp(`{subdomain:[a-z]+}.git.cpyree.fr`, `develop.git.cpyree.fr`)"
+
+
