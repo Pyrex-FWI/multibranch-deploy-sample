@@ -39,6 +39,6 @@ services:
       - ./../httpd/my-httpd.conf:/usr/local/apache2/conf/httpd.conf
       - ./../httpd/conf/extra/httpd-vhosts-git.conf:/usr/local/apache2/conf/extra/httpd-vhosts-git.conf
     labels:
-      - "traefik.http.routers.webserver.rule=HostRegexp(`{subdomain:[a-z]+}.git.cpyree.fr`, `develop.git.cpyree.fr`)"
+      - "traefik.http.routers.webserver.rule=HostRegexp(`{subdomain:[a-z]+}.git.cpyree.fr`)"
 
 
